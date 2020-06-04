@@ -1,0 +1,7 @@
+PyQt5
+pyqt5-tools
+paramiko
+pysftp
+pysqlite3
+HTMLParser
+bs4

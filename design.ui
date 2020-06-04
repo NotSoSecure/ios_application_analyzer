@@ -1,0 +1,558 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>782</width>
+    <height>491</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QTabWidget" name="tabWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>781</width>
+      <height>551</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>5</number>
+    </property>
+    <property name="tabBarAutoHide">
+     <bool>false</bool>
+    </property>
+    <widget class="QWidget" name="tabDeviceInfo">
+     <attribute name="title">
+      <string>Device Info</string>
+     </attribute>
+     <widget class="QPushButton" name="btnConnect">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>340</y>
+        <width>220</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Connect</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="txtIPAddress">
+      <property name="geometry">
+       <rect>
+        <x>370</x>
+        <y>180</y>
+        <width>121</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="txtPort">
+      <property name="geometry">
+       <rect>
+        <x>370</x>
+        <y>220</y>
+        <width>121</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>22</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="lblIPAddress">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>180</y>
+        <width>81</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>IP Address</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="lblPort">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>220</y>
+        <width>81</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Port</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="lblTitle">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>120</y>
+        <width>201</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>28</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>SSH Connection</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="lblUsername">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>260</y>
+        <width>81</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Username</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="lblChangePassword">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>300</y>
+        <width>81</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Password</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="txtUsername">
+      <property name="geometry">
+       <rect>
+        <x>370</x>
+        <y>260</y>
+        <width>121</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>root</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="txtPassword">
+      <property name="geometry">
+       <rect>
+        <x>370</x>
+        <y>300</y>
+        <width>121</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>alpine</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tabAppInfo">
+     <attribute name="title">
+      <string>App Info</string>
+     </attribute>
+     <widget class="QListWidget" name="listApplication">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>50</y>
+        <width>251</width>
+        <height>461</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="lblApplications">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>0</y>
+        <width>201</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>28</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Applications</string>
+      </property>
+     </widget>
+     <widget class="QGroupBox" name="gbApplicationInfo">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>40</y>
+        <width>501</width>
+        <height>240</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Application Information</string>
+      </property>
+      <widget class="QLabel" name="stlblBundleID">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>111</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Bundle ID</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="stlblBundelName">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>60</y>
+         <width>111</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Bundle Name</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="stlblBundleUUID">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>90</y>
+         <width>111</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Bundle UUID</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="stlblDataUUID">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>120</y>
+         <width>111</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Data UUID</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="stlblBundleVersion">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>150</y>
+         <width>111</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Bundle Version</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="stlblPlatformVersion">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>180</y>
+         <width>121</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Platform Version</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="stlblMinimumOS">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>210</y>
+         <width>121</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Minimum OS</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="lblBundleVersion">
+       <property name="geometry">
+        <rect>
+         <x>140</x>
+         <y>150</y>
+         <width>351</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>N/A</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="lblDataUUID">
+       <property name="geometry">
+        <rect>
+         <x>140</x>
+         <y>120</y>
+         <width>351</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>N/A</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="lblMinimumOS">
+       <property name="geometry">
+        <rect>
+         <x>140</x>
+         <y>210</y>
+         <width>351</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>N/A</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="lblPlatformVersion">
+       <property name="geometry">
+        <rect>
+         <x>140</x>
+         <y>180</y>
+         <width>351</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>N/A</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="lblBundleUUID">
+       <property name="geometry">
+        <rect>
+         <x>140</x>
+         <y>90</y>
+         <width>351</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>N/A</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="lblBundleName">
+       <property name="geometry">
+        <rect>
+         <x>140</x>
+         <y>60</y>
+         <width>351</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>N/A</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="lblBundleID">
+       <property name="geometry">
+        <rect>
+         <x>140</x>
+         <y>30</y>
+         <width>351</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>N/A</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QLabel" name="lblLocalPath">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>290</y>
+        <width>481</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Local Path</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btnMobSF">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>310</y>
+        <width>501</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>MobSF</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btnReSnapShot">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>340</y>
+        <width>501</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Latest Code</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tabPListFiles">
+     <attribute name="title">
+      <string>PListFiles</string>
+     </attribute>
+     <widget class="QListView" name="lstPListFiles">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>761</width>
+        <height>141</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QTextEdit" name="txtPListFileData">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>160</y>
+        <width>761</width>
+        <height>331</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tabSQLDatabases">
+     <attribute name="title">
+      <string>SQLDatabases</string>
+     </attribute>
+     <widget class="QTextEdit" name="txtDatabaseFileContent">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>160</y>
+        <width>761</width>
+        <height>331</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QListView" name="lstDatabaseFiles">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>761</width>
+        <height>141</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tabKeychain">
+     <attribute name="title">
+      <string>Keychain</string>
+     </attribute>
+     <widget class="QTextEdit" name="txtKeyChainData">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>761</width>
+        <height>421</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tabMiscellaneous">
+     <attribute name="title">
+      <string>Miscellaneous</string>
+     </attribute>
+     <widget class="QLabel" name="lblURLHandlers">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>91</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>URL Handlers</string>
+      </property>
+     </widget>
+     <widget class="QTextEdit" name="txtURLHandlers">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>121</width>
+        <height>101</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tabFileSystem">
+     <attribute name="title">
+      <string>File System</string>
+     </attribute>
+    </widget>
+    <widget class="QWidget" name="tabTools">
+     <attribute name="title">
+      <string>Tools</string>
+     </attribute>
+    </widget>
+    <widget class="QWidget" name="tabLog">
+     <attribute name="title">
+      <string>Log</string>
+     </attribute>
+    </widget>
+    <widget class="QWidget" name="tabPasteboard">
+     <attribute name="title">
+      <string>Pasteboard</string>
+     </attribute>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
