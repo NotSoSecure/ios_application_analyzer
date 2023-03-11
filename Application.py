@@ -43,9 +43,10 @@ class Application:
 		localPath="{}/Info.plist".format(localPath)		
 		self.objSSHClient.get(remotePath,localPath)
 
-		plist_content = plistlib.readPlist(localPath)
-		if 'CFBundleIdentifier' in plist_content:
-			self.currentSelectedAppBundleName = plist_content['CFBundleIdentifier']
+		with open(localPath, 'rb') as fp :
+			plist_content = plistlib.loads(fp.read())
+			if 'CFBundleIdentifier' in plist_content:
+				self.currentSelectedAppBundleName = plist_content['CFBundleIdentifier']
 		command = "cd {} && find . -name '{}' | grep 'Caches/{}'".format(self.globalVariables.dataPath, self.currentSelectedAppBundleName, self.currentSelectedAppBundleName)
 		rawData = self.objSSHClient.executeCommand(command)
 		if not rawData:

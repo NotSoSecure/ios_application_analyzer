@@ -42,12 +42,13 @@ class Main:
 		self.mainWin.lblDataUUID.setText(self.applications.currentSelectedAppDataUUID)
 		self.mainWin.lblLocalPath.setText("Local directory path : ./Output/{}".format(self.applications.currentSelectedAppName))
 		plistFile = "./Output/{}/Bundle/{}/{}/Info.plist".format(self.applications.currentAppName, self.applications.currentSelectedAppBundleUUID, self.applications.currentSelectedAppName)
-		plist_content = plistlib.readPlist(plistFile)
-		self.mainWin.lblBundleID.setText(plist_content['CFBundleIdentifier'])
-		self.mainWin.lblBundleName.setText(plist_content['CFBundleName'])
-		self.mainWin.lblBundleVersion.setText(plist_content['CFBundleVersion'])
-		self.mainWin.lblPlatformVersion.setText(plist_content['DTPlatformVersion'])
-		self.mainWin.lblMinimumOS.setText(plist_content['MinimumOSVersion'])
+		with open(plistFile, 'rb') as fp :
+			plist_content = plistlib.loads(fp.read())
+			self.mainWin.lblBundleID.setText(plist_content['CFBundleIdentifier'])
+			self.mainWin.lblBundleName.setText(plist_content['CFBundleName'])
+			self.mainWin.lblBundleVersion.setText(plist_content['CFBundleVersion'])
+			self.mainWin.lblPlatformVersion.setText(plist_content['DTPlatformVersion'])
+			self.mainWin.lblMinimumOS.setText(plist_content['MinimumOSVersion'])
 
 	def ForceDownloadCodeFromDevice(self):
 		self.applications.CopyBundleAndDataDirectory(self.mainWin.listApplication.selectedItems()[0].text(), True)
@@ -80,8 +81,9 @@ class Main:
 		if len(self.mainWin.lstPListFiles.selectedItems()) == 1:
 			try:
 				filePath="./Output/{}{}".format(self.applications.currentAppName, self.mainWin.lstPListFiles.selectedItems()[0].text())
-				plist_content = plistlib.readPlist(filePath)
-				self.mainWin.txtPListFileData.setText(json.dumps(plist_content, sort_keys=True, indent=4))
+				with open(filePath, 'rb') as fp :
+					plist_content = plistlib.loads(fp.read())
+					self.mainWin.txtPListFileData.setText(json.dumps(plist_content, sort_keys=True, indent=4))
 			except:
 				self.mainWin.txtPListFileData.setText("Failed to parse plist file!")
 
