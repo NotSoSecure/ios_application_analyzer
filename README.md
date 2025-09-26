@@ -5,8 +5,8 @@ The tool is used to analyze the content of the iOS application in local storage.
 - Install and run the application in virutal environment
 ```
 python -m venv ios_application_analyzer
-ios_application_analyzer/Scripts/activate
-pip install -r requirements.txt
+ios_application_analyzer\Scripts\activate
+pip install -r requirement.txt
 python main.py
 ```
 

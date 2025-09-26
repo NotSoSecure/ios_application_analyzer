@@ -338,3 +338,5 @@ ASALocalRun/
 
 # Removing Mac specific atrocities
 .DS_Store
+ios_application_analyzer/*
+Output/*
