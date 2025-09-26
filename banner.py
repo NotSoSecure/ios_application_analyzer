@@ -1,6 +1,8 @@
+from datetime import datetime
 
 def getBanner():
-	banner= """
+    current_year = datetime.now().year
+    banner= rf"""
  _ _____ _____    ___              _ _           _   _              
 (_)  _  /  ___|  / _ \            | (_)         | | (_)             
  _| | | \ `--.  / /_\ \_ __  _ __ | |_  ___ __ _| |_ _  ___  _ __   
@@ -17,6 +19,6 @@ def getBanner():
      \_| |_/_| |_|\__,_|_|\__, /___\___|_|                          
                            __/ |                                    
                           |___/                                                                                                               
-NotSoSecure (c) 2020 | Developed by Sanjay Gondaliya - www.sanjaygondaliya.com
-	  """
-	return banner
+NotSoSecure (c) {current_year} | Developed by Sanjay Gondaliya
+      """
+    return banner

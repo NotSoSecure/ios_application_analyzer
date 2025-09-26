@@ -2,7 +2,7 @@ import requests
 import os
 from bs4 import BeautifulSoup
 import subprocess
-from PyQt5.QtWidgets import QMessageBox
+from PySide6.QtWidgets import QMessageBox
 
 class GlobalVariables:
 	def __init__(self):
@@ -13,6 +13,10 @@ class GlobalVariables:
 		self.appListCmd='cd {} && find . -name "*.app"'.format(self.bundlePath);
 		self.mobSFURL="http://localhost:8000"
 		self.mobSFAPIKey=""
+		self.isWindowsOS=False
+
+		if os.name == 'nt':
+			self.isWindowsOS = True
 
 	def InitializeMobSFVariables(self):
 		isSuccess=False
@@ -26,11 +30,13 @@ class GlobalVariables:
 		return isSuccess
 
 	def ExecuteCommand(self, command):
+		print (command)
 		p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
 		output = p.communicate()[0].decode("utf-8", errors="ignore")
 		p_status = p.wait()
+		print (output)
+		print ("\n\n")
 		return output
 
 	def ShowErrorDailog(self, mainWin, errorMessage):
-		error=QMessageBox()
-		error.critical(mainWin, self.toolName, errorMessage, QMessageBox.Ok)
+		QMessageBox.critical(mainWin, self.toolName, errorMessage, QMessageBox.StandardButton.Ok)

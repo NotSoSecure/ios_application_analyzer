@@ -1,19 +1,10 @@
-# Author : sanjay@notsosecure.com
-#
-# main.py: Initiator file for the project.
-#
-# Project : Android Application Analyzer
-
-import os
-from gui import *
 import sys
-import base64
-import paramiko
-import plistlib
-from GlobalVariables import *
-from Application import *
-from SSHSession import *
+from PySide6.QtWidgets import QApplication, QMainWindow, QListWidgetItem
+from gui import *
 from banner import *
+from GlobalVariables import *
+from SSHSession import *
+from Application import *
 import json
 import sqlite3
 
@@ -41,7 +32,7 @@ class Main:
 		self.mainWin.lblBundleUUID.setText(self.applications.currentSelectedAppBundleUUID)
 		self.mainWin.lblDataUUID.setText(self.applications.currentSelectedAppDataUUID)
 		self.mainWin.lblLocalPath.setText("Local directory path : ./Output/{}".format(self.applications.currentSelectedAppName))
-		plistFile = "./Output/{}/Bundle/{}/{}/Info.plist".format(self.applications.currentAppName, self.applications.currentSelectedAppBundleUUID, self.applications.currentSelectedAppName)
+		plistFile = "./Output/{}/Bundle/{}/Info.plist".format(self.applications.currentAppName, self.applications.currentSelectedAppName)
 		with open(plistFile, 'rb') as fp :
 			plist_content = plistlib.loads(fp.read())
 			self.mainWin.lblBundleID.setText(plist_content['CFBundleIdentifier'])
@@ -70,22 +61,32 @@ class Main:
 			self.globalVariables.ShowErrorDailog(self.mainWin, "Application not select in App Info tab")
 			self.mainWin.tabWidget.setCurrentIndex(1)
 		else:
-			command = "cd ./Output/{} && find . -name '*.plist'".format(self.applications.currentAppName)
+			command = ""
+			if self.globalVariables.isWindowsOS:
+				command = "cd ./Output/{} && dir /s /b *.plist".format(self.applications.currentAppName)
+			else:
+				command = "cd ./Output/{} && find . -name '*.plist'".format(self.applications.currentAppName)
 			output = self.globalVariables.ExecuteCommand(command)
 			for line in output.split("\n"):
 				line = line.strip()
-				line = line[1:]
+				if not self.globalVariables.isWindowsOS:
+					line = line[1:]
 				self.mainWin.lstPListFiles.addItem(QListWidgetItem(line))
 
 	def DisplayPListFileContent(self):
 		if len(self.mainWin.lstPListFiles.selectedItems()) == 1:
 			try:
-				filePath="./Output/{}{}".format(self.applications.currentAppName, self.mainWin.lstPListFiles.selectedItems()[0].text())
+				filePath=""
+				if self.globalVariables.isWindowsOS:
+					filePath=self.mainWin.lstPListFiles.selectedItems()[0].text()
+					print (filePath)
+				else:
+					filePath="./Output/{}{}".format(self.applications.currentAppName, self.mainWin.lstPListFiles.selectedItems()[0].text())
 				with open(filePath, 'rb') as fp :
 					plist_content = plistlib.loads(fp.read())
 					self.mainWin.txtPListFileData.setText(json.dumps(plist_content, sort_keys=True, indent=4))
 			except:
-				self.mainWin.txtPListFileData.setText("Failed to parse plist file!")
+				raise
 
 	def FillDatabaseFiles(self):
 		self.mainWin.lstDatabaseFiles.clear()
@@ -94,11 +95,15 @@ class Main:
 			self.globalVariables.ShowErrorDailog(self.mainWin, "Application not select in App Info tab")
 			self.mainWin.tabWidget.setCurrentIndex(1)
 		else:
-			command = "cd ./Output/{} && find . -name '*.db'".format(self.applications.currentAppName)
+			if self.globalVariables.isWindowsOS:
+				command = "cd ./Output/{} && dir /s /b *.db".format(self.applications.currentAppName)
+			else:
+				command = "cd ./Output/{} && find . -name '*.db'".format(self.applications.currentAppName)
 			output = self.globalVariables.ExecuteCommand(command)
 			for line in output.split("\n"):
 				line = line.strip()
-				line = line[1:]
+				if not self.globalVariables.isWindowsOS:
+					line = line[1:]
 				self.mainWin.lstDatabaseFiles.addItem(QListWidgetItem(line))
 	
 	def GetTableData(self, dbPath, tableName):
@@ -119,7 +124,12 @@ class Main:
 
 	def DisplayDatabaseFileContent(self):
 		if len(self.mainWin.lstDatabaseFiles.selectedItems()) == 1:
-			filePath="./Output/{}{}".format(self.applications.currentAppName, self.mainWin.lstDatabaseFiles.selectedItems()[0].text())
+			filePath=""
+			if self.globalVariables.isWindowsOS:
+				filePath=self.mainWin.lstDatabaseFiles.selectedItems()[0].text()
+				print (filePath)
+			else:	
+				filePath="./Output/{}{}".format(self.applications.currentAppName, self.mainWin.lstDatabaseFiles.selectedItems()[0].text())
 			self.mainWin.txtDatabaseFileContent.setText("SQLiteDB : "+filePath)
 			tables=[]
 			con = sqlite3.connect(filePath)
@@ -161,12 +171,9 @@ class Main:
 			self.mainWin.tabWidget.setCurrentIndex(0)
 		else:
 			self.objSSHClient.put_all("./tools/keychain_dumper", "/var/tmp/")
-			output = self.objSSHClient.executeCommand("keychain_dumper")
-			if not output:
-				output = self.objSSHClient.executeCommand("cd /var/tmp/keychain_dumper/ && chmod +755 setup_on_iOS.sh && chmod +755 keychain_dumper && ./setup_on_iOS.sh && keychain_dumper")
-				self.FillKeyChainData(output)
-			else:
-				self.FillKeyChainData(output)
+			output = self.objSSHClient.executeCommand("./keychain_dumper -a")
+			print (output)
+			self.FillKeyChainData(output)
 
 	def TabIndexChanged(self):
 		tabIndex = self.mainWin.tabWidget.currentIndex()
@@ -186,13 +193,15 @@ class Main:
 			print ("Data")
 
 if __name__ == "__main__":
-	app = QtWidgets.QApplication(sys.argv)
+	app = QApplication(sys.argv)
 	app.setWindowIcon(QtGui.QIcon('./Usage/icon.png'))
 	print (getBanner())
-	MainWindow = QtWidgets.QMainWindow()
+
+	window = QMainWindow()
 	ui = Ui_MainWindow()
-	main=Main(ui)
-	ui.setupUi(MainWindow)
+	ui.setupUi(window)
+	main = Main(ui)
+
 	ui.tabWidget.currentChanged.connect(lambda: main.TabIndexChanged())
 	ui.lstPListFiles.itemClicked.connect(lambda: main.DisplayPListFileContent())
 	ui.lstDatabaseFiles.itemClicked.connect(lambda: main.DisplayDatabaseFileContent())
@@ -200,5 +209,6 @@ if __name__ == "__main__":
 	ui.btnReSnapShot.clicked.connect(lambda: main.ForceDownloadCodeFromDevice())
 	ui.btnMobSF.clicked.connect(lambda: main.RunMobSFTool())
 	ui.listApplication.itemClicked.connect(lambda: main.SelectApplication())
-	MainWindow.show()
-	sys.exit(app.exec_())
+
+	window.show()
+	sys.exit(app.exec())

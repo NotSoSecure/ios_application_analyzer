@@ -2,14 +2,21 @@
 
 The tool is used to analyze the content of the iOS application in local storage.
  <br /> <br />
-Install the dependency using following command 
-- `pip3 install -r requirement.txt`
+- Install and run the application in virutal environment
+```
+python -m venv ios_application_analyzer
+ios_application_analyzer/Scripts/activate
+pip install -r requirements.txt
+python main.py
+```
 
-Use the following command to run the tool 
-- `python3 main.py` 
+Download Keychain Dumper from the following link and put inside tools folder
+	- https://github.com/ptoomey3/Keychain-Dumper/releases/tag/1.2.0
 
 ##### Note: For the performance it is highly recommend to connect device  using USB and  SSH over USB using iproxy or equivalent tools
 Reference: https://iphonedevwiki.net/index.php/SSH_Over_USB
+
+For windows: https://github.com/L1ghtmann/libimobiledevice/releases/
 
 # Tool Usage
 Run iproxy tool to connect iPhone device over USB as shown in Figure:
