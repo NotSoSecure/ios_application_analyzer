@@ -7,6 +7,7 @@ from SSHSession import *
 from Application import *
 import json
 import sqlite3
+import webbrowser
 
 class Main:
 	def __init__(self, mainWin):
@@ -46,13 +47,15 @@ class Main:
 		self.mainWin.lblDataUUID.setText(self.applications.currentSelectedAppDataUUID)
 
 	def RunMobSFTool(self):
-		isSuccess=self.globalVariables.InitializeMobSFVariables()
+		isSuccess, session_id=self.globalVariables.InitializeMobSFVariables()
 		if isSuccess:
 			self.applications.CreateIPAFileFromSource()
 			ipaPath = "./Output/{}/{}.ipa".format(self.applications.currentAppName, self.applications.currentAppName)
-			command = "curl -F 'file=@{}' {}/api/v1/upload -H \"Authorization:{}\"".format(ipaPath, self.globalVariables.mobSFURL, self.globalVariables.mobSFAPIKey)
+			command = "curl -F \"file=@{}\" {}/api/v1/upload -H \"Authorization:{}\" -H \"Cookie: sessionid= {}\"".format(ipaPath, self.globalVariables.mobSFURL, self.globalVariables.mobSFAPIKey, session_id)
+			print (command)
 			self.globalVariables.ExecuteCommand(command)
 			webbrowser.open_new_tab("{}/recent_scans/".format(self.globalVariables.mobSFURL))
+
 
 	def FillPListFiles(self):
 		self.mainWin.lstPListFiles.clear()
@@ -79,7 +82,6 @@ class Main:
 				filePath=""
 				if self.globalVariables.isWindowsOS:
 					filePath=self.mainWin.lstPListFiles.selectedItems()[0].text()
-					print (filePath)
 				else:
 					filePath="./Output/{}{}".format(self.applications.currentAppName, self.mainWin.lstPListFiles.selectedItems()[0].text())
 				with open(filePath, 'rb') as fp :
@@ -127,7 +129,6 @@ class Main:
 			filePath=""
 			if self.globalVariables.isWindowsOS:
 				filePath=self.mainWin.lstDatabaseFiles.selectedItems()[0].text()
-				print (filePath)
 			else:	
 				filePath="./Output/{}{}".format(self.applications.currentAppName, self.mainWin.lstDatabaseFiles.selectedItems()[0].text())
 			self.mainWin.txtDatabaseFileContent.setText("SQLiteDB : "+filePath)
@@ -172,7 +173,6 @@ class Main:
 		else:
 			self.objSSHClient.put_all("./tools/keychain_dumper", "/var/tmp/")
 			output = self.objSSHClient.executeCommand("./keychain_dumper -a")
-			print (output)
 			self.FillKeyChainData(output)
 
 	def TabIndexChanged(self):
