@@ -225,7 +225,7 @@ class Ui_MainWindow(QWidget):
         self.txtIPAddress.setText("127.0.0.1")
 
         self.btnConnect.setText(_translate("MainWindow", "Connect"))
-        self.txtPort.setText(_translate("MainWindow", "2222"))
+        self.txtPort.setText(_translate("MainWindow", "22"))
 
         self.lblIPAddress.setText(_translate("MainWindow", "IP Address"))
         self.lblPort.setText(_translate("MainWindow", "Port"))

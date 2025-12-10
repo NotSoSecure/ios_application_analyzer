@@ -12,6 +12,8 @@ class GlobalVariables:
 		self.dataPath='/var/mobile/Containers/Data/Application/'
 		self.appListCmd='cd {} && find . -name "*.app"'.format(self.bundlePath);
 		self.mobSFURL="http://localhost:8000"
+		self.mobSFUsername="mobsf"
+		self.mobSFPassword="mobsf"
 		self.mobSFAPIKey=""
 		self.isWindowsOS=False
 
@@ -23,7 +25,7 @@ class GlobalVariables:
 		session_id=""
 		try:
 			session = requests.Session()
-			resp = session.post("http://192.168.29.200:8000/login/", data={"username": "mobsf", "password": "mobsf"}, allow_redirects=False)
+			resp = session.post("{}/login/".format(self.mobSFURL), data={"username": self.mobSFUsername, "password": self.mobSFPassword}, allow_redirects=False)
 			session_id=resp.cookies.get("sessionid")
 			response=requests.get("{}/api_docs".format(self.mobSFURL), timeout=10, cookies={"sessionid": session_id})
 			soup = BeautifulSoup(response.text, "lxml")
