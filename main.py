@@ -8,6 +8,7 @@ from Application import *
 import json
 import sqlite3
 import webbrowser
+import os
 
 class Main:
 	def __init__(self, mainWin):
@@ -175,6 +176,16 @@ class Main:
 			output = self.objSSHClient.executeCommand("./keychain_dumper -a")
 			self.FillKeyChainData(output)
 
+	def ShowDirectoryViewOfApplication(self):
+		self.mainWin.lstPListFiles.clear()
+		self.mainWin.txtPListFileData.setText("")
+		if self.applications == None or self.applications.currentAppName == "":
+			self.globalVariables.ShowErrorDailog(self.mainWin, "Application not select in App Info tab")
+			self.mainWin.tabWidget.setCurrentIndex(1)
+		else:
+			dirPath = "{}/Output/{}".format(os.getcwd(), self.applications.currentAppName)
+			self.mainWin.setDirectoryPath(dirPath)
+
 	def TabIndexChanged(self):
 		tabIndex = self.mainWin.tabWidget.currentIndex()
 		if tabIndex == 0:
@@ -189,6 +200,8 @@ class Main:
 			self.FillDatabaseFiles()
 		elif tabIndex == 4:
 			self.DumpKeyChainData()
+		elif tabIndex == 5:
+			self.ShowDirectoryViewOfApplication()
 		else:
 			print ("Data")
 

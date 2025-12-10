@@ -69,7 +69,12 @@ class SSHSession:
         for remote_dir, files in self.sftp_walk(remotepath):
             rel_dir = posixpath.relpath(remote_dir, remotepath)
             local_dir = os.path.join(localpath, rel_dir) if rel_dir != "." else localpath
-            os.makedirs(local_dir, exist_ok=True)
+
+            try:
+                os.makedirs(local_dir, exist_ok=True)
+                pass
+            except Exception as e:
+                print("Error:", e)
 
             for file in files:
                 remote_file = posixpath.join(remote_dir, file)
