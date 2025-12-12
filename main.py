@@ -8,6 +8,7 @@ from Application import *
 import json
 import sqlite3
 import webbrowser
+import plistlib
 import os
 
 class Main:
@@ -57,134 +58,106 @@ class Main:
 			self.globalVariables.ExecuteCommand(command)
 			webbrowser.open_new_tab("{}/recent_scans/".format(self.globalVariables.mobSFURL))
 
+	def DisplayPListFileContent(self, path):
+		try:
+			with open(path, "rb") as f:  # binary mode
+				data = plistlib.load(f)
+			self.mainWin.txtFilePreview.setPlainText(str(data))
+		except Exception as e:
+			self.mainWin.txtFilePreview.setPlainText(f"[Plist Error]\n{e}")
 
-	def FillPListFiles(self):
-		self.mainWin.lstPListFiles.clear()
-		self.mainWin.txtPListFileData.setText("")
-		if self.applications == None or self.applications.currentAppName == "":
-			self.globalVariables.ShowErrorDailog(self.mainWin, "Application not select in App Info tab")
-			self.mainWin.tabWidget.setCurrentIndex(1)
-		else:
-			command = ""
-			if self.globalVariables.isWindowsOS:
-				command = "cd ./Output/{} && dir /s /b *.plist".format(self.applications.currentAppName)
-			else:
-				command = "cd ./Output/{} && find . -name '*.plist'".format(self.applications.currentAppName)
-			output = self.globalVariables.ExecuteCommand(command)
-			for line in output.split("\n"):
-				line = line.strip()
-				if not self.globalVariables.isWindowsOS:
-					line = line[1:]
-				self.mainWin.lstPListFiles.addItem(QListWidgetItem(line))
+	def DisplayTextFileContent(self, path):
+		try:
+			with open(path, "r", encoding="utf-8", errors="ignore") as f:
+				data = f.read()
 
-	def DisplayPListFileContent(self):
-		if len(self.mainWin.lstPListFiles.selectedItems()) == 1:
+			beautified = None
 			try:
-				filePath=""
-				if self.globalVariables.isWindowsOS:
-					filePath=self.mainWin.lstPListFiles.selectedItems()[0].text()
-				else:
-					filePath="./Output/{}{}".format(self.applications.currentAppName, self.mainWin.lstPListFiles.selectedItems()[0].text())
-				with open(filePath, 'rb') as fp :
-					plist_content = plistlib.loads(fp.read())
-					self.mainWin.txtPListFileData.setText(json.dumps(plist_content, sort_keys=True, indent=4))
-			except:
-				raise
+				parsed = json.loads(data)# Check if valid JSON
+				beautified = json.dumps(parsed, indent=4, ensure_ascii=False)
+			except Exception:
+				pass  # Not JSON → fallback to plain text
 
-	def FillDatabaseFiles(self):
-		self.mainWin.lstDatabaseFiles.clear()
-		self.mainWin.txtDatabaseFileContent.setText("")
-		if self.applications == None or self.applications.currentAppName == "":
-			self.globalVariables.ShowErrorDailog(self.mainWin, "Application not select in App Info tab")
-			self.mainWin.tabWidget.setCurrentIndex(1)
-		else:
-			if self.globalVariables.isWindowsOS:
-				command = "cd ./Output/{} && dir /s /b *.db".format(self.applications.currentAppName)
+			if beautified:
+				self.mainWin.txtFilePreview.setPlainText(beautified)
 			else:
-				command = "cd ./Output/{} && find . -name '*.db'".format(self.applications.currentAppName)
-			output = self.globalVariables.ExecuteCommand(command)
-			for line in output.split("\n"):
-				line = line.strip()
-				if not self.globalVariables.isWindowsOS:
-					line = line[1:]
-				self.mainWin.lstDatabaseFiles.addItem(QListWidgetItem(line))
-	
-	def GetTableData(self, dbPath, tableName):
-		rows=[]
-		con = sqlite3.connect(dbPath)
-		cursor = con.cursor()
-		cursor.execute("SELECT * FROM " + tableName)
+				self.mainWin.txtFilePreview.setPlainText(data)
+		except Exception as e:
+			self.mainWin.txtFilePreview.setPlainText(f"[Text Error]\n{e}")
 
-		colnames = cursor.description
-		row=''
-		for colname in colnames:
-			row+=colname[0] + " | "
-		rows.append(row)
+	def DisplayDatabaseFileContent(self, path):
+		try:
+			conn = sqlite3.connect(path)
+			cursor = conn.cursor()
 
-		for row in cursor.fetchall():
-			rows.append(row)
-		return rows
-
-	def DisplayDatabaseFileContent(self):
-		if len(self.mainWin.lstDatabaseFiles.selectedItems()) == 1:
-			filePath=""
-			if self.globalVariables.isWindowsOS:
-				filePath=self.mainWin.lstDatabaseFiles.selectedItems()[0].text()
-			else:	
-				filePath="./Output/{}{}".format(self.applications.currentAppName, self.mainWin.lstDatabaseFiles.selectedItems()[0].text())
-			self.mainWin.txtDatabaseFileContent.setText("SQLiteDB : "+filePath)
-			tables=[]
-			con = sqlite3.connect(filePath)
-			cursor = con.cursor()
+			# Fetch all table names
 			cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-			for table_name in cursor.fetchall():
-				table = table_name[0]
-				self.mainWin.txtDatabaseFileContent.append("\n\n\nTable => " + table.format(type(str), repr(str)))
-				rows=self.GetTableData(filePath, table)
-				isFirstRow=True
-				for columns in rows:
-					rowData=""
-					for column in columns:
-						try:
-							rowData+=column.format(type(str), repr(str))
-							if not isFirstRow:
-								rowData+=" | "
-						except:
-							rowData+=str(column)
-							if not isFirstRow:
-								rowData+=" | "
-					isFirstRow=False
-					dataLen = len(rowData)
-					if dataLen > 174:
-						dataLen = 174
-					self.mainWin.txtDatabaseFileContent.append("-"*dataLen)
-					self.mainWin.txtDatabaseFileContent.append(rowData)
-					self.mainWin.txtDatabaseFileContent.append("-"*dataLen)
+			tables = cursor.fetchall()
 
-	def FillKeyChainData(self, data):
-		self.mainWin.txtKeyChainData.setText("KeyChain Data:\n=============")
-		for line in data:
-			line.strip()
-			self.mainWin.txtKeyChainData.append(line)
+			if not tables:
+				self.mainWin.txtFilePreview.setPlainText("No tables found in database.")
+				return
 
-	def DumpKeyChainData(self):
-		if self.objSSHClient == None:
-			self.globalVariables.ShowErrorDailog(self.mainWin, "SSH Connection not initiated!!")
-			self.mainWin.tabWidget.setCurrentIndex(0)
-		else:
-			self.objSSHClient.put_all("./tools/keychain_dumper", "/var/tmp/")
-			output = self.objSSHClient.executeCommand("./keychain_dumper -a")
-			self.FillKeyChainData(output)
+			# Start output
+			output = []
+			output.append(f"SQLite Database: {path}")
+
+			for (table_name,) in tables:
+				output.append("\n\n=== TABLE: {} ===".format(table_name))
+
+				try:
+					# Read table content
+					cursor.execute(f"SELECT * FROM {table_name}")
+					rows = cursor.fetchall()
+					colnames = [desc[0] for desc in cursor.description]
+
+					# Header row
+					header = " | ".join(colnames)
+					separator = "-" * len(header)
+
+					output.append(separator)
+					output.append(header)
+					output.append(separator)
+
+					# Add each row
+					for row in rows:
+						safe_row = " | ".join(str(col) for col in row)
+						output.append(safe_row)
+
+					output.append(separator)
+
+				except Exception as te:
+					output.append(f"[Error reading table {table_name}] {te}")
+
+			# Update UI
+			self.mainWin.txtFilePreview.setPlainText("\n".join(output))
+
+		except Exception as e:
+			self.mainWin.txtFilePreview.setPlainText(f"[SQLite Error]\n{e}")
 
 	def ShowDirectoryViewOfApplication(self):
-		self.mainWin.lstPListFiles.clear()
-		self.mainWin.txtPListFileData.setText("")
 		if self.applications == None or self.applications.currentAppName == "":
 			self.globalVariables.ShowErrorDailog(self.mainWin, "Application not select in App Info tab")
 			self.mainWin.tabWidget.setCurrentIndex(1)
 		else:
 			dirPath = "{}/Output/{}".format(os.getcwd(), self.applications.currentAppName)
-			self.mainWin.setDirectoryPath(dirPath)
+			self.mainWin.treeView.setRootIndex(self.mainWin.dirModel.index(dirPath))
+
+	def DisplayFileContentFromView(self, index):
+		path = self.mainWin.dirModel.filePath(index)
+		if not QtCore.QFileInfo(path).isFile():
+			return
+		try:
+			root, ext = os.path.splitext(path.lower())
+			if ext == ".plist":
+				self.DisplayPListFileContent(path)
+			elif ext in [".sqlite", ".db"]:
+				self.DisplayDatabaseFileContent(path)
+			else:
+				self.DisplayTextFileContent(path)
+		except Exception as e:
+			self.mainWin.txtFilePreview.setPlainText(str(e))
+
 
 	def TabIndexChanged(self):
 		tabIndex = self.mainWin.tabWidget.currentIndex()
@@ -195,12 +168,6 @@ class Main:
 				self.globalVariables.ShowErrorDailog(self.mainWin, "SSH Connection not initiated!!")
 				self.mainWin.tabWidget.setCurrentIndex(0)
 		elif tabIndex == 2:
-			self.FillPListFiles()
-		elif tabIndex == 3:
-			self.FillDatabaseFiles()
-		elif tabIndex == 4:
-			self.DumpKeyChainData()
-		elif tabIndex == 5:
 			self.ShowDirectoryViewOfApplication()
 		else:
 			print ("Data")
@@ -216,9 +183,10 @@ if __name__ == "__main__":
 	main = Main(ui)
 
 	ui.tabWidget.currentChanged.connect(lambda: main.TabIndexChanged())
-	ui.lstPListFiles.itemClicked.connect(lambda: main.DisplayPListFileContent())
-	ui.lstDatabaseFiles.itemClicked.connect(lambda: main.DisplayDatabaseFileContent())
 	ui.btnConnect.clicked.connect(lambda: main.SSHConnection())
+
+	ui.treeView.clicked.connect(lambda index: main.DisplayFileContentFromView(index))
+
 	ui.btnReSnapShot.clicked.connect(lambda: main.ForceDownloadCodeFromDevice())
 	ui.btnMobSF.clicked.connect(lambda: main.RunMobSFTool())
 	ui.listApplication.itemClicked.connect(lambda: main.SelectApplication())
