@@ -142,6 +142,9 @@ class Ui_MainWindow(QWidget):
 
         # File preview
         self.txtFilePreview = QtWidgets.QTextEdit()
+        previewFont = QtGui.QFont()
+        previewFont.setPointSize(12)   # Change this to any size you like
+        self.txtFilePreview.setFont(previewFont)
 
         splitter.addWidget(self.treeView)
         splitter.addWidget(self.txtFilePreview)
