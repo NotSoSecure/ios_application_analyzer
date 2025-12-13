@@ -28,7 +28,7 @@ class Main:
 		self.applications.FillAppInList()
 
 	def SelectApplication(self):
-		if self.applications.CopyBundleAndDataDirectory(self.mainWin.listApplication.selectedItems()[0].text()):
+		if self.applications.CopyBundleAndDataDirectory(self.mainWin.listApplication.selectedItems()[0].text(), False):
 			self.FillApplicationInformation()
 
 	def FillApplicationInformation(self):
@@ -62,26 +62,27 @@ class Main:
 		try:
 			with open(path, "rb") as f:  # binary mode
 				data = plistlib.load(f)
-			self.mainWin.txtFilePreview.setPlainText(str(data))
+			self.mainWin.txtFilePreview.setPlainText(self.ParseJsonData(str(data)))
 		except Exception as e:
 			self.mainWin.txtFilePreview.setPlainText(f"[Plist Error]\n{e}")
+
+	def ParseJsonData(self, data):
+		beautified = None
+		try:
+			parsed = json.loads(data)# Check if valid JSON
+			beautified = json.dumps(parsed, indent=4, ensure_ascii=False)
+		except Exception:
+			pass  # Not JSON → fallback to plain text
+
+		if beautified:
+			return beautified
+		return data
 
 	def DisplayTextFileContent(self, path):
 		try:
 			with open(path, "r", encoding="utf-8", errors="ignore") as f:
 				data = f.read()
-
-			beautified = None
-			try:
-				parsed = json.loads(data)# Check if valid JSON
-				beautified = json.dumps(parsed, indent=4, ensure_ascii=False)
-			except Exception:
-				pass  # Not JSON → fallback to plain text
-
-			if beautified:
-				self.mainWin.txtFilePreview.setPlainText(beautified)
-			else:
-				self.mainWin.txtFilePreview.setPlainText(data)
+			self.mainWin.txtFilePreview.setPlainText(self.ParseJsonData(data))
 		except Exception as e:
 			self.mainWin.txtFilePreview.setPlainText(f"[Text Error]\n{e}")
 

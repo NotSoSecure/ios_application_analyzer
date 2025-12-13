@@ -4,6 +4,8 @@ import plistlib
 import os 
 from datetime import datetime
 import shutil
+import tkinter as tk
+from tkinter import messagebox
 
 class Application:
 	def __init__(self, sshClient, mainWin):
@@ -58,29 +60,50 @@ class Application:
 		shutil.rmtree(localPath)
 		return isError
 
-	def CopyBundleAndDataDirectory(self, appName, force=False):
+	def isCopyBundleAndDataDirectory(self, appName, force):
 		for app in self.apps:
 			if len(app) == 2 and app[0] == appName:
 				self.currentSelectedAppName = app[0]
 				self.currentSelectedAppBundleUUID = app[1]
 				self.currentAppName= self.currentSelectedAppName[0: self.currentSelectedAppName.find(".")]
 				break
-		if not self.GetDataDirUUID():
-			outputBundleDirName = "./Output/{}/Bundle".format(self.currentAppName)
-			outputDataDirName = "./Output/{}/Data".format(self.currentAppName)
-			if force:
-				dateTime = str(datetime.now())
-				os.rename("./Output/{}".format(self.currentAppName), "./Output/{}_{}".format(self.currentAppName, str(dateTime).replace(":","_").replace(".","_").replace(" ","__")))
 
-			if not os.path.exists(outputBundleDirName):
-				metaDataPath = '{}{}'.format(self.globalVariables.bundlePath, self.currentSelectedAppBundleUUID)
-				self.objSSHClient.get_all(metaDataPath, outputBundleDirName)
-			
-			if not os.path.exists(outputDataDirName):
-				metaDataPath = '{}{}'.format(self.globalVariables.dataPath, self.currentSelectedAppDataUUID)
-				self.objSSHClient.get_all(metaDataPath, outputDataDirName)
+		if not force:
+			outputDirName = "./Output/{}".format(self.currentAppName)
+			if os.path.exists(outputDirName) and not force:
+				root = tk.Tk()
+				root.withdraw()  # hide main window
+				result = messagebox.askyesno("Folder Exists", f"The folder '{outputDirName}' already exists.\n\nDo you want to copy it again?")
+				root.destroy()
+				if result:
+					return True
+				else:
+					return False
+			else:
+				return True
+		else:
 			return True
-		return False
+
+	def CopyBundleAndDataDirectory(self, appName, force=False):
+		if self.isCopyBundleAndDataDirectory(appName, force):
+			if not self.GetDataDirUUID():
+				outputBundleDirName = "./Output/{}/Bundle".format(self.currentAppName)
+				outputDataDirName = "./Output/{}/Data".format(self.currentAppName)
+				if force:
+					dateTime = str(datetime.now())
+					outDir = "./Output/{}_{}".format(self.currentAppName, str(dateTime).replace(":","_").replace(".","_").replace(" ","__"))
+					os.rename("./Output/{}".format(self.currentAppName), outDir)
+
+				if not os.path.exists(outputBundleDirName):
+					metaDataPath = '{}{}'.format(self.globalVariables.bundlePath, self.currentSelectedAppBundleUUID)
+					self.objSSHClient.get_all(metaDataPath, outputBundleDirName)
+				
+				if not os.path.exists(outputDataDirName):
+					metaDataPath = '{}{}'.format(self.globalVariables.dataPath, self.currentSelectedAppDataUUID)
+					self.objSSHClient.get_all(metaDataPath, outputDataDirName)
+				return True
+			return False
+		return True
 
 	def CreateIPAFileFromSource(self):
 		if self.globalVariables.isWindowsOS:
