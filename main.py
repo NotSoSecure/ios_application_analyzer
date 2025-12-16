@@ -58,11 +58,29 @@ class Main:
 			self.globalVariables.ExecuteCommand(command)
 			webbrowser.open_new_tab("{}/recent_scans/".format(self.globalVariables.mobSFURL))
 
+	def SanitizePlist(self, obj):
+		if isinstance(obj, plistlib.UID):
+			return int(obj.data)
+		elif isinstance(obj, dict):
+			return {k: self.SanitizePlist(v) for k, v in obj.items()}
+		elif isinstance(obj, list):
+			return [self.SanitizePlist(v) for v in obj]
+		else:
+			return obj
+
 	def DisplayPListFileContent(self, path):
 		try:
 			with open(path, "rb") as f:  # binary mode
-				data = plistlib.load(f)
-			self.mainWin.txtFilePreview.setPlainText(self.ParseJsonData(str(data)))
+				plist_data = plistlib.load(f)
+
+			plist_data = self.SanitizePlist(plist_data)
+			pretty_plist = plistlib.dumps(
+				plist_data,
+				fmt=plistlib.FMT_XML,
+				sort_keys=True
+			).decode("utf-8")
+
+			self.mainWin.txtFilePreview.setPlainText(self.ParseJsonData(str(pretty_plist)))
 		except Exception as e:
 			self.mainWin.txtFilePreview.setPlainText(f"[Plist Error]\n{e}")
 
@@ -150,9 +168,14 @@ class Main:
 			return
 		try:
 			root, ext = os.path.splitext(path.lower())
-			if ext == ".plist":
+			
+			mime_db = QtCore.QMimeDatabase()
+			mime_type = mime_db.mimeTypeForFile(path, QtCore.QMimeDatabase.MatchContent)
+			mime_name = mime_type.name()
+
+			if ext in [".plist"]  or mime_name in ["application/x-bplist"]:
 				self.DisplayPListFileContent(path)
-			elif ext in [".sqlite", ".db"]:
+			elif ext in [".sqlite", ".db"] or mime_name in ["application/x-sqlite3"]:
 				self.DisplayDatabaseFileContent(path)
 			else:
 				self.DisplayTextFileContent(path)
