@@ -106,10 +106,27 @@ class Application:
 		return True
 
 	def CreateIPAFileFromSource(self):
-		if self.globalVariables.isWindowsOS:
-			command = "cd \"./Output/{}/\" && mkdir Payload && xcopy Bundle Payload /E /I /H && mkdir \"{}\" && move Payload \"{}/\" && powershell -Command \"Compress-Archive -Path '{}\\*' -DestinationPath '{}.zip'\" && ren \"{}.zip\" \"{}.ipa\"".format(self.currentAppName, self.currentAppName, self.currentAppName, self.currentAppName, self.currentAppName, self.currentAppName, self.currentAppName, self.currentAppName)
-		else:
-			command = "cd ./Output/{}/ && mkdir Payload && cp -r Bundle Payload/ && zip -r Payload.zip Payload/ && mv Payload.zip {}.ipa && rm -rf Payload && mv {}.ipa ../../".format(self.currentAppName, self.currentSelectedAppName, self.currentAppName, self.currentAppName)
-		self.globalVariables.ExecuteCommand(command)
+		payloadDirPath = "./Output/{}/Payload".format(self.currentAppName)
+		bundleDirPath = "./Output/{}/Bundle".format(self.currentAppName)
+		appNamePath = "./Output/{}/{}".format(self.currentAppName, self.currentAppName)
+		zipFileName = "./Output/{}/{}.zip".format(self.currentAppName, self.currentAppName)
+		iPAFileName = "./Output/{}/{}.ipa".format(self.currentAppName, self.currentAppName)
+		
+		if os.path.isfile(iPAFileName):
+			os.remove(iPAFileName)
+
+		if os.path.isfile(zipFileName):
+			os.remove(zipFileName)
+
+		if os.path.isdir(appNamePath):
+			shutil.rmtree(appNamePath)
+
+		shutil.copytree(bundleDirPath, payloadDirPath, dirs_exist_ok=True)
+
+		shutil.move(payloadDirPath, "{}/Payload".format(appNamePath))
+
+		shutil.make_archive(appNamePath, 'zip', appNamePath)
+		shutil.rmtree(appNamePath)
+		shutil.move(zipFileName, iPAFileName)
 
 
