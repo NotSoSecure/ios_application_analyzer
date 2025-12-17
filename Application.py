@@ -6,6 +6,7 @@ from datetime import datetime
 import shutil
 import tkinter as tk
 from tkinter import messagebox
+import time
 
 class Application:
 	def __init__(self, sshClient, mainWin):
@@ -56,7 +57,7 @@ class Application:
 			dataUUID = rawData[0].strip()
 			self.currentSelectedAppDataUUID = dataUUID[2: dataUUID.find("/", 3)]
 
-		localPath="./Output/{}".format(self.currentAppName)
+		localPath="./Output/{}/Bundle/{}".format(self.currentAppName, self.currentSelectedAppBundleUUID)
 		shutil.rmtree(localPath)
 		return isError
 
@@ -94,13 +95,12 @@ class Application:
 					outDir = "./Output/{}_{}".format(self.currentAppName, str(dateTime).replace(":","_").replace(".","_").replace(" ","__"))
 					os.rename("./Output/{}".format(self.currentAppName), outDir)
 
-				if not os.path.exists(outputBundleDirName):
-					metaDataPath = '{}{}'.format(self.globalVariables.bundlePath, self.currentSelectedAppBundleUUID)
-					self.objSSHClient.get_all(metaDataPath, outputBundleDirName)
+				metaDataPath = '{}{}'.format(self.globalVariables.bundlePath, self.currentSelectedAppBundleUUID)
+				self.objSSHClient.get_all(metaDataPath, outputBundleDirName)
 				
-				if not os.path.exists(outputDataDirName):
-					metaDataPath = '{}{}'.format(self.globalVariables.dataPath, self.currentSelectedAppDataUUID)
-					self.objSSHClient.get_all(metaDataPath, outputDataDirName)
+				metaDataPath = '{}{}'.format(self.globalVariables.dataPath, self.currentSelectedAppDataUUID)
+				self.objSSHClient.get_all(metaDataPath, outputDataDirName)
+				
 				return True
 			return False
 		return True

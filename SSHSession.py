@@ -72,9 +72,9 @@ class SSHSession:
 
             try:
                 os.makedirs(local_dir, exist_ok=True)
-                pass
             except Exception as e:
                 print("Error:", e)
+                continue
 
             for file in files:
                 remote_file = posixpath.join(remote_dir, file)
